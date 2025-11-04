@@ -29,21 +29,22 @@ const Index = () => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        setSelectedImage(event.target?.result as string);
-        analyzeImage();
+      reader.onload = async (event) => {
+        const imageData = event.target?.result as string;
+        setSelectedImage(imageData);
+        await analyzeImage(imageData);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const analyzeImage = async () => {
-    if (!selectedImage) return;
+  const analyzeImage = async (imageData: string) => {
+    if (!imageData) return;
     
     setIsAnalyzing(true);
     
     try {
-      const base64Image = selectedImage.split(',')[1];
+      const base64Image = imageData.split(',')[1];
       
       const response = await fetch('https://functions.poehali.dev/eb35858d-ef63-46f4-887e-b9ae061ac0a7', {
         method: 'POST',
