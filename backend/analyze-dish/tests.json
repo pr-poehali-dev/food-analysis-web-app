@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS request for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedHeaders": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "name": "POST with valid JSON structure",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "test": "data"
+      },
+      "expectedStatus": 400,
+      "bodyMatcher": "partial",
+      "expectedBody": {
+        "error": "string"
+      }
+    }
+  ]
+}

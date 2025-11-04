@@ -37,34 +37,37 @@ const Index = () => {
     }
   };
 
-  const analyzeImage = () => {
+  const analyzeImage = async () => {
+    if (!selectedImage) return;
+    
     setIsAnalyzing(true);
     
-    setTimeout(() => {
-      setNutritionData({
-        dishName: 'Салат Цезарь с курицей',
-        calories: 420,
-        protein: 32,
-        fats: 18,
-        carbs: 28,
-        ingredients: [
-          { name: 'Куриная грудка', amount: '150г', category: 'Белок' },
-          { name: 'Салат Романо', amount: '100г', category: 'Овощи' },
-          { name: 'Пармезан', amount: '30г', category: 'Молочное' },
-          { name: 'Соус Цезарь', amount: '40г', category: 'Соусы' },
-          { name: 'Гренки', amount: '25г', category: 'Углеводы' },
-          { name: 'Помидоры черри', amount: '50г', category: 'Овощи' }
-        ],
-        recommendations: [
-          'Отличный выбор для обеда — сбалансированное соотношение белков и углеводов',
-          'Содержит 38% дневной нормы белка',
-          'Рекомендуется сократить соус для снижения калорийности на 80 ккал',
-          'Добавьте больше зелени для повышения клетчатки'
-        ]
+    try {
+      const base64Image = selectedImage.split(',')[1];
+      
+      const response = await fetch('https://functions.poehali.dev/eb35858d-ef63-46f4-887e-b9ae061ac0a7', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: base64Image
+        })
       });
-      setIsAnalyzing(false);
+      
+      if (!response.ok) {
+        throw new Error('Ошибка анализа');
+      }
+      
+      const data = await response.json();
+      setNutritionData(data);
       toast.success('Анализ завершён!');
-    }, 2000);
+    } catch (error) {
+      console.error('Error analyzing image:', error);
+      toast.error('Не удалось проанализировать изображение. Попробуйте ещё раз.');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const getTotalMacros = () => {
